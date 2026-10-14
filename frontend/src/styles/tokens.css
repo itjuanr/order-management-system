@@ -1,0 +1,107 @@
+/*
+ * Kairo — tokens do design system.
+ * Neutros (zinc) carregam a interface; o laranja da marca aparece só em foco, seleção,
+ * links e no gráfico. Ações primárias usam "ink" (preto no claro, branco no escuro).
+ */
+:root {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --bg: #ffffff;
+  --bg-subtle: #fafafa;
+  --surface: #ffffff;
+  --surface-muted: #f4f4f5;
+  --surface-hover: #f4f4f5;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --text: #09090b;
+  --text-muted: #52525b;
+  --text-subtle: #71717a;
+  --text-faint: #a1a1aa;
+
+  --ink: #18181b;
+  --ink-hover: #3f3f46;
+  --ink-contrast: #ffffff;
+
+  --accent: #e8590c;
+  --accent-hover: #d9480f;
+  --accent-soft: #fff4e6;
+  --accent-text: #c2410c;
+
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+  --success: #15803d;
+  --success-soft: #f0fdf4;
+  --success-border: #bbf7d0;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+  --warning-border: #fde68a;
+  --info: #1d4ed8;
+  --info-soft: #eff6ff;
+  --info-border: #bfdbfe;
+
+  /* Série única dos gráficos (validada contra a superfície com o script do skill de dataviz). */
+  --chart-1: #e8590c;
+  --chart-track: #f4f4f5;
+
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-pop: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 12px 32px -8px rgba(0, 0, 0, 0.18);
+  --ring: 0 0 0 3px rgba(232, 89, 12, 0.22);
+
+  --sidebar-width: 268px;
+  --topbar-height: 64px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b0b0d;
+  --bg-subtle: #0f0f12;
+  --surface: #111114;
+  --surface-muted: #19191d;
+  --surface-hover: #1c1c21;
+  --border: #26262b;
+  --border-strong: #36363d;
+
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-subtle: #8b8b94;
+  --text-faint: #5b5b63;
+
+  --ink: #fafafa;
+  --ink-hover: #d4d4d8;
+  --ink-contrast: #09090b;
+
+  --accent: #f76b15;
+  --accent-hover: #ff802b;
+  --accent-soft: #2a170b;
+  --accent-text: #ff8f4d;
+
+  --danger: #f87171;
+  --danger-soft: #2a1213;
+  --danger-border: #4c1d1f;
+  --success: #4ade80;
+  --success-soft: #0f2418;
+  --success-border: #1c4128;
+  --warning: #fbbf24;
+  --warning-soft: #2a2008;
+  --warning-border: #4a3810;
+  --info: #7aa2ff;
+  --info-soft: #121c33;
+  --info-border: #1f3160;
+
+  --chart-1: #ea5f0f;
+  --chart-track: #1c1c21;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+  --ring: 0 0 0 3px rgba(247, 107, 21, 0.3);
+
+  color-scheme: dark;
+}

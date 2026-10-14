@@ -1,0 +1,215 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Visão geral</h1>
+      <p>Olá, {{ auth.primeiroNome() }}. Estes são os números da {{ marca.loja }} em {{ hoje | date: 'MMMM' }}.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn btn-secondary live-toggle" [class.is-on]="aoVivo.ativo()" [disabled]="aoVivo.alterando()"
+        (click)="aoVivo.alternar()" [attr.aria-pressed]="aoVivo.ativo()"
+        title="Gera pedidos e avança status automaticamente, como numa loja em funcionamento">
+        <span class="live-dot"></span>
+        {{ aoVivo.ativo() ? 'Simulação ao vivo' : 'Ligar simulação' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="dados.reload()" [disabled]="dados.isLoading()">
+        <i class="icon-refresh-cw" [class.spin]="dados.isLoading()"></i> Atualizar
+      </button>
+    </div>
+  </header>
+
+  @if (erro()) {
+    <div class="alert alert--danger">
+      <i class="icon-circle-alert"></i> {{ erro() }}
+    </div>
+  }
+
+  @if (dados.value(); as d) {
+    <div class="card kpis">
+      <div class="kpi">
+        <span class="kpi-label">Receita no mês</span>
+        <span class="kpi-value">{{ d.faturamentoMes | currency }}</span>
+        @if (variacao() !== null) {
+          <span class="kpi-foot">
+            <span class="delta" [class.delta--down]="variacao()! < 0">
+              <i [class]="variacao()! >= 0 ? 'icon-trending-up' : 'icon-trending-down'"></i>
+              {{ variacao()! >= 0 ? '+' : '' }}{{ variacao()! * 100 | number: '1.0-1' }}%
+            </span>
+            vs. mesmo período de {{ mesPassado | date: 'MMMM' }}
+          </span>
+        }
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Vendas</span>
+        <span class="kpi-value">{{ d.vendasMes }}</span>
+        <span class="kpi-foot">pedidos pagos no mês</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Ticket médio</span>
+        <span class="kpi-value">{{ d.ticketMedioMes | currency }}</span>
+        <span class="kpi-foot">por venda</span>
+      </div>
+      <a class="kpi kpi--link" routerLink="/pedidos" [queryParams]="{ status: 'AGUARDANDO_PAGAMENTO' }">
+        <span class="kpi-label">Aguardando pagamento <i class="icon-arrow-up-right"></i></span>
+        <span class="kpi-value">{{ d.pedidosAguardandoPagamento }}</span>
+        <span class="kpi-foot">pedidos em aberto</span>
+      </a>
+      <a class="kpi kpi--link" routerLink="/pedidos" [queryParams]="{ status: 'PAGO' }">
+        <span class="kpi-label">A enviar <i class="icon-arrow-up-right"></i></span>
+        <span class="kpi-value">{{ d.pedidosParaEnviar }}</span>
+        <span class="kpi-foot">pagos, aguardando envio</span>
+      </a>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Receita mensal</h2>
+            <p class="card-sub">Pagamentos recebidos nos últimos 6 meses, sem pedidos cancelados</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <app-grafico-faturamento [dados]="d.faturamentoMensal" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Pedidos por status</h2>
+            <p class="card-sub">{{ totalPedidos() | number }} pedidos no total</p>
+          </div>
+        </div>
+        <ul class="status-list card-body">
+          @for (s of d.pedidosPorStatus; track s.status) {
+            <li>
+              <a routerLink="/pedidos" [queryParams]="{ status: s.status }" class="status-row">
+                <span class="status-row-label">
+                  <i [class]="status[s.status].icon" [attr.data-tom]="status[s.status].tom"></i>
+                  {{ status[s.status].label }}
+                </span>
+                <span class="num">{{ s.quantidade }}</span>
+              </a>
+              <span class="meter" [attr.data-tom]="status[s.status].tom">
+                <span [style.width.%]="totalPedidos() ? (s.quantidade / totalPedidos()) * 100 : 0"></span>
+              </span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-side">
+      <div class="card">
+        <div class="card-header">
+          <h2>Pedidos recentes</h2>
+          <a routerLink="/pedidos" class="btn btn-ghost btn-sm">Ver todos <i class="icon-arrow-right"></i></a>
+        </div>
+        <div class="table-wrap">
+          <table class="table table--clickable">
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th class="col-num">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of d.ultimosPedidos; track p.id) {
+                <tr (click)="router.navigate(['/pedidos', p.id])">
+                  <td><a [routerLink]="['/pedidos', p.id]" class="cell-id" (click)="$event.stopPropagation()">#{{ p.id }}</a></td>
+                  <td class="cell-strong">{{ p.clienteNome }}</td>
+                  <td><app-status-badge [status]="p.status" /></td>
+                  <td class="subtle">{{ p.criadoEm | date: "dd MMM, HH:mm" }}</td>
+                  <td class="col-num">{{ p.total | currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Atividade</h2>
+            @if (aoVivo.ativo()) {
+              <span class="live-badge"><span class="live-dot"></span> ao vivo</span>
+            }
+          </div>
+          @if (atividades.value()?.length) {
+            <ol class="feed">
+              @for (a of atividades.value()!; track a.id) {
+                <li class="feed-item" [attr.data-tipo]="a.tipo">
+                  <span class="feed-icon"><i [class]="iconeAtividade[a.tipo]"></i></span>
+                  <div>
+                    <a [routerLink]="['/pedidos', a.pedidoId]">{{ a.descricao }}</a>
+                    <span class="cell-meta">{{ a.quando | tempoRelativo }} · {{ a.autor === 'Simulador' ? 'simulação' : '@' + a.autor }}</span>
+                  </div>
+                </li>
+              }
+            </ol>
+          } @else {
+            <p class="card-body subtle feed-vazio">
+              Nada por aqui ainda. Crie um pedido ou ligue a simulação para ver a loja funcionando em tempo real.
+            </p>
+          }
+        </div>
+
+      </div>
+
+      <div class="dash-side">
+        <div class="card">
+          <div class="card-header">
+            <h2>Estoque baixo</h2>
+            <a routerLink="/produtos" [queryParams]="{ estoqueBaixo: true }" class="btn btn-ghost btn-sm">Ver todos</a>
+          </div>
+          @if (d.estoqueBaixo.length) {
+            <ul class="mini-list">
+              @for (p of d.estoqueBaixo; track p.id) {
+                <li>
+                  <div class="mini-list-main">
+                    <strong>{{ p.nome }}</strong>
+                    <span class="cell-meta"><span class="mono">{{ p.sku }}</span> · mínimo {{ p.estoqueMinimo }}</span>
+                  </div>
+                  <span class="badge badge--solid" [attr.data-tom]="p.estoque === 0 ? 'danger' : 'warning'">
+                    {{ p.estoque === 0 ? 'Esgotado' : p.estoque + ' un.' }}
+                  </span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="card-body subtle">Nenhum produto abaixo do mínimo.</p>
+          }
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Mais vendidos</h2>
+            <span class="card-sub">por receita</span>
+          </div>
+          <ol class="mini-list">
+            @for (p of d.maisVendidos; track p.id; let i = $index) {
+              <li class="ranking">
+                <span class="ranking-pos">{{ i + 1 }}</span>
+                <div class="ranking-info">
+                  <strong>{{ p.nome }}</strong>
+                  <span class="meter meter--thin"><span [style.width.%]="(p.receita / maiorReceita()) * 100"></span></span>
+                </div>
+                <div class="ranking-value">
+                  <strong class="num">{{ p.receita | currency: 'BRL' : 'symbol' : '1.0-0' }}</strong>
+                  <span class="cell-meta">{{ p.quantidade }} un.</span>
+                </div>
+              </li>
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+  } @else if (dados.isLoading()) {
+    <div class="card skeleton"></div>
+    <div class="card skeleton skeleton--block"></div>
+  }
+</section>

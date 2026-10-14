@@ -1,0 +1,92 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Pedidos</h1>
+      <p>Acompanhe cada venda do pagamento à entrega.</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="tabs" role="tablist" aria-label="Filtrar por status">
+      @for (aba of abas; track aba) {
+        <button type="button" role="tab" class="tab" [class.is-active]="(status() || '') === aba"
+          [attr.aria-selected]="(status() || '') === aba" (click)="filtrar({ status: aba })">
+          {{ aba ? statusInfo[aba].label : 'Todos' }}
+        </button>
+      }
+    </div>
+
+    <div class="toolbar">
+      <div class="search-field search-field--grow">
+        <i class="icon-search"></i>
+        <input class="input" type="search" placeholder="Buscar por cliente ou nº do pedido" aria-label="Buscar pedidos"
+          [value]="busca()" (input)="buscar($any($event.target).value)" />
+      </div>
+      @if (cliente.value(); as c) {
+        <span class="chip">
+          <i class="icon-user"></i> {{ c.nome }}
+          <button type="button" aria-label="Remover filtro de cliente" (click)="filtrar({ clienteId: null })">
+            <i class="icon-x"></i>
+          </button>
+        </span>
+      }
+      @if (pedidos.value(); as p) {
+        <span class="muted toolbar-count">{{ p.totalElements }} {{ p.totalElements === 1 ? 'pedido' : 'pedidos' }}</span>
+      }
+    </div>
+
+    @if (erro()) {
+      <div class="card-body">
+        <div class="alert alert--danger"><i class="icon-circle-alert"></i> {{ erro() }}</div>
+      </div>
+    }
+
+    <div class="table-wrap" [class.is-loading]="pedidos.isLoading()">
+      @if (pedidos.value()?.content?.length) {
+        <table class="table table--clickable">
+          <thead>
+            <tr>
+              <th>Pedido</th>
+              <th>Cliente</th>
+              <th class="col-num">Itens</th>
+              <th>Pagamento</th>
+              <th>Status</th>
+              <th class="col-num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of pedidos.value()!.content; track p.id) {
+              <tr (click)="router.navigate(['/pedidos', p.id])">
+                <td>
+                  <a [routerLink]="['/pedidos', p.id]" class="cell-strong" (click)="$event.stopPropagation()">#{{ p.id }}</a>
+                  <div class="cell-meta">{{ p.criadoEm | date: "dd/MM/yyyy 'às' HH:mm" }}</div>
+                </td>
+                <td>{{ p.clienteNome }}</td>
+                <td class="col-num">{{ p.quantidadeItens }}</td>
+                <td>
+                  @if (p.metodoPagamento) {
+                    <span class="with-icon"><i [class]="metodos[p.metodoPagamento].icon"></i> {{ metodos[p.metodoPagamento].label }}</span>
+                  } @else {
+                    <span class="muted">—</span>
+                  }
+                </td>
+                <td><app-status-badge [status]="p.status" /></td>
+                <td class="col-num cell-strong">{{ p.total | currency }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (!pedidos.isLoading()) {
+        <div class="empty">
+          <i class="icon-receipt"></i>
+          <strong>Nenhum pedido encontrado</strong>
+          <span>Ajuste os filtros ou crie um novo pedido.</span>
+        </div>
+      }
+    </div>
+
+    @if (pedidos.value(); as p) {
+      <app-paginador [pagina]="p.page" [tamanho]="tamanho" [total]="p.totalElements" (mudar)="pagina.set($event)" />
+    }
+  </div>
+</section>

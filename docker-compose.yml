@@ -1,0 +1,32 @@
+# docker compose up --build  →  http://localhost:8080 (admin / admin123)
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: kairo
+      MYSQL_ROOT_PASSWORD: kairo
+    volumes:
+      - dados:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pkairo"]
+      interval: 5s
+      retries: 20
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_HOST: db
+      DB_NAME: kairo
+      DB_USER: root
+      DB_PASSWORD: kairo
+      JWT_SECRET: troque-este-segredo-em-producao
+      SIMULADOR_ATIVO: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dados:

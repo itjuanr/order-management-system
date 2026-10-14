@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: order-management-api
+  profiles:
+    default: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none # o schema é versionado pelo Flyway (db/migration)
+    properties:
+      hibernate:
+        default_batch_fetch_size: 50 # carrega coleções/associações lazy em lote (evita N+1)
+  mvc:
+    problemdetails:
+      enabled: true
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+
+app:
+  versao: @project.version@
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-troque-em-producao}
+    expiration-hours: 8
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
+  simulador:
+    # Gera pedidos e avança status sozinho (também dá para ligar/desligar pela tela).
+    ativo: ${SIMULADOR_ATIVO:false}
+    intervalo-ms: 6000
+  seed:
+    # Popula clientes, catálogo e ~6 meses de pedidos quando o banco está vazio.
+    demo-data: ${SEED_DEMO_DATA:true}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: method
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:pedidos;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pedidos}?createDatabaseIfNotExist=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}

@@ -1,0 +1,135 @@
+<div class="shell" [class.shell--nav-open]="menuAberto()">
+  <aside class="sidebar">
+    <a routerLink="/dashboard" class="workspace" (click)="menuAberto.set(false)">
+      <app-logo [tamanho]="34" />
+      <div class="workspace-info">
+        <strong>{{ marca.loja }}</strong>
+        <span>{{ marca.produto }}</span>
+      </div>
+    </a>
+
+    <nav class="nav" aria-label="Menu principal">
+      @for (grupo of grupos; track $index) {
+        @if (grupo.titulo) {
+          <span class="nav-label">{{ grupo.titulo }}</span>
+        }
+        @for (item of grupo.itens; track item.link) {
+          <a [routerLink]="item.link" routerLinkActive="is-active" class="nav-link" (click)="menuAberto.set(false)">
+            <i [class]="item.icone"></i> {{ item.rotulo }}
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a routerLink="/perfil" routerLinkActive="is-active" class="nav-link" (click)="menuAberto.set(false)">
+        <i class="icon-circle-user"></i> Meu perfil
+      </a>
+      <a class="nav-link" href="/swagger-ui" target="_blank" rel="noopener">
+        <i class="icon-book-open"></i> Documentação da API
+        <i class="icon-arrow-up-right nav-extra"></i>
+      </a>
+    </div>
+  </aside>
+
+  <div class="shell-backdrop" (click)="menuAberto.set(false)"></div>
+
+  <div class="shell-main">
+    <header class="topbar">
+      <button type="button" class="icon-btn topbar-menu" aria-label="Abrir menu" (click)="menuAberto.set(!menuAberto())">
+        <i class="icon-menu"></i>
+      </button>
+
+      <ol class="breadcrumbs" aria-label="Você está em">
+        @for (m of migalhas(); track m.link) {
+          <li>
+            @if (m.atual) {
+              <span aria-current="page">{{ m.rotulo }}</span>
+            } @else {
+              <a [routerLink]="m.link">{{ m.rotulo }}</a>
+            }
+          </li>
+        }
+      </ol>
+
+      @if (aoVivo.ativo()) {
+        <a routerLink="/dashboard" class="live-badge live-badge--header" title="Simulação de pedidos ligada">
+          <span class="live-dot"></span> Ao vivo
+        </a>
+      }
+
+      <span class="topbar-spacer"></span>
+
+      <button type="button" class="topbar-search" (click)="busca.aberta.set(true)" aria-label="Buscar">
+        <i class="icon-search"></i>
+        <span>Buscar pedidos, clientes…</span>
+        <kbd>{{ atalho }}</kbd>
+      </button>
+
+      <app-notificacoes />
+
+      <button type="button" class="icon-btn" (click)="tema.alternar()"
+        [attr.aria-label]="tema.escuro() ? 'Usar tema claro' : 'Usar tema escuro'"
+        [title]="tema.escuro() ? 'Usar tema claro' : 'Usar tema escuro'">
+        <i [class]="tema.escuro() ? 'icon-sun' : 'icon-moon'"></i>
+      </button>
+
+      <a routerLink="/pedidos/novo" class="btn btn-primary">
+        <i class="icon-plus"></i> <span class="rotulo-longo">Novo pedido</span>
+      </a>
+
+      <span class="topbar-divider"></span>
+
+      <div class="profile">
+        <button type="button" class="profile-trigger" [attr.aria-expanded]="perfilAberto()" aria-haspopup="menu"
+          (click)="perfilAberto.set(!perfilAberto())">
+          <span class="avatar">{{ auth.iniciais() }}</span>
+          <span class="profile-trigger-text">
+            <strong>{{ auth.primeiroNome() }}</strong>
+            <span>{{ cargo() }}</span>
+          </span>
+          <i class="icon-chevron-down"></i>
+        </button>
+
+        @if (perfilAberto()) {
+          <div class="profile-menu" role="menu">
+            <div class="profile-head">
+              <span class="avatar avatar--lg">{{ auth.iniciais() }}</span>
+              <div>
+                <strong>{{ auth.nome() }}</strong>
+                <span>{{ cargo() }} · {{ marca.loja }}</span>
+                <span class="mono">{{ '@' + auth.usuario() }}</span>
+              </div>
+            </div>
+            <div class="profile-sep"></div>
+            <a routerLink="/perfil" class="profile-item" role="menuitem" (click)="perfilAberto.set(false)">
+              <i class="icon-circle-user"></i> Meu perfil
+            </a>
+            <a routerLink="/perfil" fragment="seguranca" class="profile-item" role="menuitem" (click)="perfilAberto.set(false)">
+              <i class="icon-key-round"></i> Alterar senha
+            </a>
+            <button type="button" class="profile-item" role="menuitem" (click)="tema.alternar()">
+              <i [class]="tema.escuro() ? 'icon-sun' : 'icon-moon'"></i>
+              {{ tema.escuro() ? 'Tema claro' : 'Tema escuro' }}
+            </button>
+            <button type="button" class="profile-item" role="menuitem" (click)="busca.aberta.set(true); perfilAberto.set(false)">
+              <i class="icon-search"></i> Busca rápida <kbd>{{ atalho }}</kbd>
+            </button>
+            <div class="profile-sep"></div>
+            <button type="button" class="profile-item profile-item--danger" role="menuitem" (click)="sair()">
+              <i class="icon-log-out"></i> Sair
+            </button>
+          </div>
+        }
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+
+    <app-rodape />
+  </div>
+</div>
+
+<app-busca-rapida />

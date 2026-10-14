@@ -1,0 +1,118 @@
+<section class="page perfil">
+  <header class="page-header">
+    <div>
+      <h1>Meu perfil</h1>
+      <p>Seus dados de acesso ao {{ marca.produto }} na {{ marca.loja }}.</p>
+    </div>
+  </header>
+
+  @if (perfil.value(); as p) {
+    <div class="card perfil-hero">
+      <span class="avatar perfil-avatar">{{ p.nome | iniciais }}</span>
+      <div class="perfil-hero-info">
+        <h2>{{ p.nome }}</h2>
+        <span class="subtle">{{ p.email }}</span>
+      </div>
+      <dl class="perfil-facts">
+        <div><dt>Usuário</dt><dd class="mono">{{ '@' + p.login }}</dd></div>
+        <div>
+          <dt>Perfil de acesso</dt>
+          <dd><span class="badge badge--solid" [attr.data-tom]="p.role === 'ADMIN' ? 'accent' : 'info'">{{ p.role === 'ADMIN' ? 'Administrador' : 'Operador' }}</span></dd>
+        </div>
+        <div><dt>Na equipe desde</dt><dd>{{ p.criadoEm | date: "d 'de' MMMM 'de' yyyy" }}</dd></div>
+      </dl>
+    </div>
+  }
+
+  <div class="perfil-secoes">
+    <div class="perfil-secao">
+      <div class="perfil-secao-texto">
+        <h2>Informações pessoais</h2>
+        <p>Nome e email aparecem no menu de perfil e identificam quem registrou cada operação.</p>
+      </div>
+      <form class="card" [formGroup]="dados" (ngSubmit)="salvarDados()">
+        <div class="card-body form">
+          <app-campo rotulo="Nome completo" [controle]="dados.controls.nome">
+            <input class="input" formControlName="nome" autocomplete="name" />
+          </app-campo>
+          <app-campo rotulo="Email" [controle]="dados.controls.email">
+            <input class="input" type="email" formControlName="email" autocomplete="email" />
+          </app-campo>
+        </div>
+        <div class="card-footer perfil-acoes">
+          <button type="submit" class="btn btn-primary" [disabled]="salvandoDados() || dados.pristine">
+            @if (salvandoDados()) { <i class="icon-loader-circle spin"></i> }
+            Salvar alterações
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="perfil-secao" id="seguranca">
+      <div class="perfil-secao-texto">
+        <h2>Senha</h2>
+        <p>Por segurança, confirme a senha atual. A nova senha precisa ter ao menos 6 caracteres.</p>
+      </div>
+      <form class="card" [formGroup]="senha" (ngSubmit)="alterarSenha()">
+        <div class="card-body form">
+          <app-campo rotulo="Senha atual" [controle]="senha.controls.senhaAtual">
+            <input class="input" type="password" formControlName="senhaAtual" autocomplete="current-password" />
+          </app-campo>
+          <div class="form-grid">
+            <app-campo rotulo="Nova senha" [controle]="senha.controls.novaSenha">
+              <input class="input" type="password" formControlName="novaSenha" autocomplete="new-password" />
+            </app-campo>
+            <app-campo rotulo="Confirmar nova senha" [controle]="senha.controls.confirmacao">
+              <input class="input" type="password" formControlName="confirmacao" autocomplete="new-password" />
+            </app-campo>
+          </div>
+        </div>
+        <div class="card-footer perfil-acoes">
+          <button type="submit" class="btn btn-primary" [disabled]="salvandoSenha()">
+            @if (salvandoSenha()) { <i class="icon-loader-circle spin"></i> }
+            Alterar senha
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="perfil-secao">
+      <div class="perfil-secao-texto">
+        <h2>Preferências</h2>
+        <p>Salvas neste navegador.</p>
+      </div>
+      <div class="card card-body">
+        <div class="temas" role="radiogroup" aria-label="Tema da interface">
+          <label class="tema-opcao" [class.is-selected]="!tema.escuro()">
+            <input type="radio" name="tema" [checked]="!tema.escuro()" (change)="tema.escuro() && tema.alternar()" />
+            <span class="tema-preview tema-preview--claro"><span></span><span></span></span>
+            Claro
+          </label>
+          <label class="tema-opcao" [class.is-selected]="tema.escuro()">
+            <input type="radio" name="tema" [checked]="tema.escuro()" (change)="!tema.escuro() && tema.alternar()" />
+            <span class="tema-preview tema-preview--escuro"><span></span><span></span></span>
+            Escuro
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="perfil-secao">
+      <div class="perfil-secao-texto">
+        <h2>Sessão</h2>
+        <p>O acesso usa um token que expira automaticamente.</p>
+      </div>
+      <div class="card card-body sessao">
+        <div>
+          <strong>Sessão ativa neste navegador</strong>
+          @if (auth.expiraEm(); as expira) {
+            <span class="subtle">Expira em {{ expira | date: "dd/MM/yyyy 'às' HH:mm" }}</span>
+          }
+        </div>
+        <button type="button" class="btn btn-secondary btn-danger-text" (click)="sair()">
+          <i class="icon-log-out"></i> Encerrar sessão
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

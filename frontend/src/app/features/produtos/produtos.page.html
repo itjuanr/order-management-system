@@ -1,0 +1,99 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Produtos</h1>
+      <p>Catálogo, preços e controle de estoque.</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="editando.set(null)"><i class="icon-plus"></i> Novo produto</button>
+  </header>
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="search-field search-field--grow">
+        <i class="icon-search"></i>
+        <input class="input" type="search" placeholder="Buscar por nome ou SKU" aria-label="Buscar produtos"
+          [value]="busca()" (input)="filtro(() => busca.set($any($event.target).value))" />
+      </div>
+      <select class="input input--auto" aria-label="Filtrar por categoria" [value]="categoriaId() ?? ''"
+        (change)="filtro(() => categoriaId.set($any($event.target).value ? +$any($event.target).value : null))">
+        <option value="">Todas as categorias</option>
+        @for (c of categorias.value() ?? []; track c.id) {
+          <option [value]="c.id">{{ c.nome }}</option>
+        }
+      </select>
+      <label class="check">
+        <input type="checkbox" [checked]="apenasEstoqueBaixo()" (change)="filtro(() => apenasEstoqueBaixo.set($any($event.target).checked))" />
+        Só estoque baixo
+      </label>
+      @if (produtos.value(); as p) {
+        <span class="muted toolbar-count">{{ p.totalElements }} {{ p.totalElements === 1 ? 'produto' : 'produtos' }}</span>
+      }
+    </div>
+
+    @if (erro()) {
+      <div class="card-body"><div class="alert alert--danger"><i class="icon-circle-alert"></i> {{ erro() }}</div></div>
+    }
+
+    <div class="table-wrap" [class.is-loading]="produtos.isLoading()">
+      @if (produtos.value()?.content?.length) {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Categoria</th>
+              <th>Fornecedor</th>
+              <th class="col-num">Preço</th>
+              <th class="col-num">Estoque</th>
+              <th>Situação</th>
+              <th class="col-actions"><span class="sr-only">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of produtos.value()!.content; track p.id) {
+              <tr>
+                <td>
+                  <span class="cell-strong">{{ p.nome }}</span>
+                  <div class="cell-meta">{{ p.sku }}</div>
+                </td>
+                <td>{{ p.categoria.nome }}</td>
+                <td class="muted">{{ p.fornecedor.nome }}</td>
+                <td class="col-num">{{ p.preco | currency }}</td>
+                <td class="col-num">
+                  @if (p.estoque === 0) {
+                    <span class="badge" data-tom="danger">Esgotado</span>
+                  } @else if (p.estoqueBaixo) {
+                    <span class="badge" data-tom="warning" [title]="'Mínimo: ' + p.estoqueMinimo">{{ p.estoque }} un.</span>
+                  } @else {
+                    {{ p.estoque }} un.
+                  }
+                </td>
+                <td>
+                  <span class="badge" [attr.data-tom]="p.ativo ? 'success' : 'neutral'">{{ p.ativo ? 'Ativo' : 'Inativo' }}</span>
+                </td>
+                <td class="col-actions">
+                  <button type="button" class="icon-btn" title="Editar" aria-label="Editar" (click)="editando.set(p)"><i class="icon-pencil"></i></button>
+                  <button type="button" class="icon-btn icon-btn--danger" title="Excluir" aria-label="Excluir" (click)="excluir(p)"><i class="icon-trash-2"></i></button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (!produtos.isLoading()) {
+        <div class="empty">
+          <i class="icon-package"></i>
+          <strong>Nenhum produto encontrado</strong>
+          <span>Ajuste os filtros ou cadastre um novo produto.</span>
+        </div>
+      }
+    </div>
+
+    @if (produtos.value(); as p) {
+      <app-paginador [pagina]="p.page" [tamanho]="tamanho" [total]="p.totalElements" (mudar)="pagina.set($event)" />
+    }
+  </div>
+</section>
+
+@if (editando() !== undefined) {
+  <app-produto-form [produto]="editando() ?? null" [categorias]="categorias.value() ?? []" [fornecedores]="fornecedores.value() ?? []"
+    (fechar)="editando.set(undefined)" (salvo)="aoSalvar()" />
+}

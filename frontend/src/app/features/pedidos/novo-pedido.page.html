@@ -1,0 +1,166 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Novo pedido</h1>
+      <p>Selecione o cliente, monte o carrinho e confira o resumo antes de criar.</p>
+    </div>
+  </header>
+
+  <div class="checkout">
+    <div class="checkout-steps">
+      <!-- 1. Cliente -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span class="step" [class.is-done]="cliente()">1</span> Cliente</h2>
+          @if (cliente()) {
+            <button type="button" class="btn btn-ghost btn-sm" (click)="selecionarCliente(null)">Trocar</button>
+          }
+        </div>
+        <div class="card-body">
+          @if (cliente(); as c) {
+            <div class="selected-client">
+              <span class="avatar avatar--lg">{{ c.nome | iniciais }}</span>
+              <div>
+                <strong>{{ c.nome }}</strong>
+                <span class="cell-meta">{{ c.email }} · CPF <span class="mono">{{ c.cpf | documento: 'cpf' }}</span></span>
+              </div>
+            </div>
+          } @else {
+            <div class="search-field">
+              <i class="icon-search"></i>
+              <input class="input" type="search" placeholder="Buscar por nome, email ou CPF" aria-label="Buscar cliente"
+                [value]="buscaCliente()" (input)="buscaCliente.set($any($event.target).value)" />
+            </div>
+            <ul class="pick-list">
+              @for (c of clientes.value()?.content ?? []; track c.id) {
+                <li>
+                  <button type="button" class="pick" (click)="selecionarCliente(c)">
+                    <span class="avatar">{{ c.nome | iniciais }}</span>
+                    <span class="pick-info">
+                      <strong>{{ c.nome }}</strong>
+                      <span class="cell-meta">{{ c.email }}</span>
+                    </span>
+                    <i class="icon-chevron-right subtle"></i>
+                  </button>
+                </li>
+              } @empty {
+                @if (!clientes.isLoading()) {
+                  <li class="pick-empty">Nenhum cliente encontrado. <a routerLink="/clientes">Cadastrar cliente</a></li>
+                }
+              }
+            </ul>
+          }
+        </div>
+      </div>
+
+      <!-- 2. Produtos -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span class="step" [class.is-done]="carrinho().length">2</span> Produtos</h2>
+          <div class="search-field">
+            <i class="icon-search"></i>
+            <input class="input" type="search" placeholder="Nome ou SKU" aria-label="Buscar produto"
+              [value]="buscaProduto()" (input)="buscaProduto.set($any($event.target).value)" />
+          </div>
+        </div>
+        <ul class="product-list">
+          @for (p of produtos.value()?.content ?? []; track p.id) {
+            <li class="product-row" [class.is-out]="p.estoque === 0">
+              <div class="product-info">
+                <strong>{{ p.nome }}</strong>
+                <span class="cell-meta"><span class="mono">{{ p.sku }}</span> · {{ p.categoria.nome }}</span>
+              </div>
+              <span class="product-stock" [class.is-low]="p.estoqueBaixo">
+                {{ p.estoque === 0 ? 'Esgotado' : p.estoque + ' em estoque' }}
+              </span>
+              <span class="product-price">{{ p.preco | currency }}</span>
+              @if (quantidadeNoCarrinho(p.id); as qtd) {
+                <button type="button" class="btn btn-secondary btn-sm product-add is-added" (click)="adicionar(p)">
+                  <i class="icon-check"></i> {{ qtd }} no carrinho
+                </button>
+              } @else {
+                <button type="button" class="btn btn-secondary btn-sm product-add" [disabled]="p.estoque === 0" (click)="adicionar(p)">
+                  <i class="icon-plus"></i> Adicionar
+                </button>
+              }
+            </li>
+          } @empty {
+            @if (!produtos.isLoading()) {
+              <li class="empty"><i class="icon-package"></i><span>Nenhum produto ativo encontrado.</span></li>
+            }
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <aside class="card checkout-summary">
+      <div class="card-header">
+        <h2>Resumo</h2>
+        @if (unidades()) {
+          <span class="card-sub">{{ unidades() }} {{ unidades() === 1 ? 'unidade' : 'unidades' }}</span>
+        }
+      </div>
+
+      @if (carrinho().length) {
+        <ul class="cart">
+          @for (item of carrinho(); track item.produto.id) {
+            <li class="cart-item">
+              <div class="cart-item-info">
+                <strong>{{ item.produto.nome }}</strong>
+                <span class="cell-meta">{{ item.produto.preco | currency }} / un.</span>
+              </div>
+              <div class="stepper" role="group" [attr.aria-label]="'Quantidade de ' + item.produto.nome">
+                <button type="button" aria-label="Diminuir" (click)="alterarQuantidade(item.produto.id, item.quantidade - 1)">
+                  <i class="icon-minus"></i>
+                </button>
+                <input type="number" min="1" [max]="item.produto.estoque" [value]="item.quantidade" aria-label="Quantidade"
+                  (change)="alterarQuantidade(item.produto.id, +$any($event.target).value)" />
+                <button type="button" aria-label="Aumentar" [disabled]="item.quantidade >= item.produto.estoque"
+                  (click)="alterarQuantidade(item.produto.id, item.quantidade + 1)">
+                  <i class="icon-plus"></i>
+                </button>
+              </div>
+              <span class="cart-subtotal">{{ item.produto.preco * item.quantidade | currency }}</span>
+              <button type="button" class="icon-btn icon-btn--danger" aria-label="Remover item" (click)="remover(item.produto.id)">
+                <i class="icon-x"></i>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty empty--compact">
+          <i class="icon-shopping-cart"></i>
+          <span>O carrinho está vazio.</span>
+        </div>
+      }
+
+      <div class="card-body checkout-footer">
+        <label class="field">
+          <span class="field-label">Observação <span class="field-optional">opcional</span></span>
+          <textarea class="input textarea" rows="2" maxlength="500" placeholder="Ex.: entregar no período da tarde"
+            [value]="observacao()" (input)="observacao.set($any($event.target).value)"></textarea>
+        </label>
+
+        <dl class="totals">
+          <div><dt>Itens ({{ unidades() }})</dt><dd>{{ total() | currency }}</dd></div>
+          <div class="totals-total"><dt>Total</dt><dd>{{ total() | currency }}</dd></div>
+        </dl>
+
+        <button type="button" class="btn btn-primary btn-block btn-lg" [disabled]="!podeFinalizar()" (click)="finalizar()">
+          @if (enviando()) { <i class="icon-loader-circle spin"></i> }
+          Criar pedido
+        </button>
+        <p class="hint">
+          @if (!cliente()) {
+            Selecione um cliente para continuar.
+          } @else if (!carrinho().length) {
+            Adicione ao menos um produto.
+          } @else {
+            O pedido fica aguardando pagamento; o estoque só é baixado quando o pagamento for registrado.
+          }
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>

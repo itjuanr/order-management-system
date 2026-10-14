@@ -1,0 +1,259 @@
+.voltar {
+  margin-top: 12px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.title-row .mono {
+  font-size: 0.95em;
+  letter-spacing: -0.03em;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: 16px;
+}
+
+.detail-main,
+.detail-side {
+  display: grid;
+  gap: 16px;
+}
+
+.note {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 14.5px;
+  color: var(--text-muted);
+}
+
+/* Histórico vertical: cada etapa ligada à seguinte por um traço. */
+.timeline {
+  display: grid;
+  margin: 0;
+  list-style: none;
+}
+
+.timeline-step {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 22px;
+}
+
+.timeline-step:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 34px;
+  bottom: 2px;
+  left: 16px;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-step[data-estado='feito']:not(:last-child)::after {
+  background: var(--text-faint);
+}
+
+.timeline-dot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 33px;
+  height: 33px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-faint);
+}
+
+.timeline-dot [class^='icon-'] {
+  font-size: 16px;
+  vertical-align: 0;
+}
+
+.timeline-step[data-estado='feito'] .timeline-dot {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--ink-contrast);
+}
+
+.timeline-step[data-estado='atual'] .timeline-dot {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+  color: var(--accent);
+}
+
+.timeline-step[data-estado='cancelado'] .timeline-dot {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+
+.timeline-text {
+  display: grid;
+  padding-top: 5px;
+  font-size: 15px;
+}
+
+.timeline-text strong {
+  font-weight: 500;
+}
+
+.timeline-text span {
+  font-size: 13.5px;
+  color: var(--text-subtle);
+}
+
+.timeline-step[data-estado='pendente'] strong {
+  color: var(--text-subtle);
+  font-weight: 400;
+}
+
+.customer {
+  display: flex;
+  gap: 12px;
+}
+
+.customer > div {
+  display: grid;
+  min-width: 0;
+}
+
+.customer strong {
+  font-weight: 500;
+}
+
+.info-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  font-size: 15px;
+}
+
+.info-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.info-list dt {
+  color: var(--text-subtle);
+}
+
+.info-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+.pending-pay,
+.pay-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.pending-pay strong,
+.pay-amount strong {
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pay-amount {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}
+
+.methods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.methods legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.method {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.12s, background-color 0.12s;
+}
+
+.method input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method [class^='icon-'] {
+  color: var(--text-subtle);
+}
+
+.method:hover {
+  background: var(--bg-subtle);
+}
+
+.method.is-selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.method.is-selected [class^='icon-'] {
+  color: var(--accent);
+}
+
+.method:has(input:focus-visible) {
+  box-shadow: var(--ring);
+}
+
+.pay-note {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--text-subtle);
+}
+
+@media (max-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.endereco {
+  display: grid;
+  gap: 2px;
+  font-size: 15px;
+  font-style: normal;
+}

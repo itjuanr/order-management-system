@@ -1,0 +1,195 @@
+<section class="page">
+  @if (erro()) {
+    <div class="card empty">
+      <i class="icon-circle-alert"></i>
+      <strong>Não foi possível abrir o pedido</strong>
+      <span>{{ erro() }}</span>
+      <a routerLink="/pedidos" class="btn btn-secondary btn-sm voltar">Voltar para pedidos</a>
+    </div>
+  }
+
+  @if (pedido.value(); as p) {
+    <header class="page-header">
+      <div>
+        <div class="title-row">
+          <h1>Pedido <span class="mono">#{{ p.id }}</span></h1>
+          <app-status-badge [status]="p.status" />
+        </div>
+        <p>{{ p.cliente.nome }} · criado em {{ p.criadoEm | date: "d 'de' MMMM 'de' yyyy, HH:mm" }}</p>
+      </div>
+
+      <div class="page-actions">
+        @if (pode().has('CANCELAR')) {
+          <button type="button" class="btn btn-secondary btn-danger-text" [disabled]="processando()" (click)="cancelar()">
+            Cancelar pedido
+          </button>
+        }
+        @if (pode().has('PAGAR')) {
+          <button type="button" class="btn btn-primary" [disabled]="processando()" (click)="pagando.set(true)">
+            <i class="icon-credit-card"></i> Registrar pagamento
+          </button>
+        }
+        @if (pode().has('ENVIAR')) {
+          <button type="button" class="btn btn-primary" [disabled]="processando()" (click)="enviar()">
+            <i class="icon-truck"></i> Marcar como enviado
+          </button>
+        }
+        @if (pode().has('ENTREGAR')) {
+          <button type="button" class="btn btn-primary" [disabled]="processando()" (click)="entregar()">
+            <i class="icon-package-check"></i> Confirmar entrega
+          </button>
+        }
+      </div>
+    </header>
+
+    <div class="detail-grid">
+      <div class="detail-main">
+        <div class="card">
+          <div class="card-header">
+            <h2>Itens</h2>
+            <span class="card-sub">{{ p.itens.length }} {{ p.itens.length === 1 ? 'produto' : 'produtos' }}</span>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th class="col-num">Qtd.</th>
+                  <th class="col-num">Preço unit.</th>
+                  <th class="col-num">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of p.itens; track item.produtoId) {
+                  <tr>
+                    <td>
+                      <span class="cell-strong">{{ item.produtoNome }}</span>
+                      <span class="cell-meta mono">{{ item.sku }}</span>
+                    </td>
+                    <td class="col-num">{{ item.quantidade }}</td>
+                    <td class="col-num">{{ item.precoUnitario | currency }}</td>
+                    <td class="col-num">{{ item.subtotal | currency }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">Total</td>
+                  <td class="col-num">{{ p.total | currency }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          @if (p.observacao) {
+            <div class="note"><i class="icon-sticky-note"></i> {{ p.observacao }}</div>
+          }
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2>Histórico</h2></div>
+          <ol class="timeline card-body">
+            @for (e of etapas(); track e.titulo) {
+              <li class="timeline-step" [attr.data-estado]="e.estado">
+                <span class="timeline-dot"><i [class]="e.icone"></i></span>
+                <div class="timeline-text">
+                  <strong>{{ e.titulo }}</strong>
+                  <span>
+                    @if (e.quando) {
+                      {{ e.quando | date: "dd/MM/yyyy 'às' HH:mm" }}
+                    } @else if (e.estado === 'atual') {
+                      Próxima etapa
+                    } @else {
+                      Pendente
+                    }
+                  </span>
+                </div>
+              </li>
+            }
+          </ol>
+        </div>
+      </div>
+
+      <aside class="detail-side">
+        <div class="card">
+          <div class="card-header"><h2>Cliente</h2></div>
+          <div class="card-body customer">
+            <span class="avatar avatar--lg">{{ p.cliente.nome | iniciais }}</span>
+            <div>
+              <strong>{{ p.cliente.nome }}</strong>
+              <span class="cell-meta">{{ p.cliente.email }}</span>
+              <span class="cell-meta">CPF <span class="mono">{{ p.cliente.cpf | documento: 'cpf' }}</span></span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a routerLink="/pedidos" [queryParams]="{ clienteId: p.cliente.id }" class="btn btn-ghost btn-sm">
+              Ver pedidos deste cliente <i class="icon-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2>Entrega</h2></div>
+          @if (p.cliente.endereco; as e) {
+            <address class="card-body endereco">
+              <span>{{ e.logradouro }}, {{ e.numero }}@if (e.complemento) { · {{ e.complemento }} }</span>
+              <span>{{ e.bairro }} · {{ e.cidade }}/{{ e.uf }}</span>
+              <span class="mono subtle">CEP {{ e.cep | documento: 'cep' }}</span>
+            </address>
+          } @else {
+            <p class="card-body subtle">Cliente sem endereço cadastrado.</p>
+          }
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2>Pagamento</h2></div>
+          @if (p.pagamento; as pg) {
+            <dl class="card-body info-list">
+              <div><dt>Forma</dt><dd class="with-icon"><i [class]="metodos[pg.metodo].icon"></i> {{ metodos[pg.metodo].label }}</dd></div>
+              <div><dt>Valor</dt><dd class="cell-strong num">{{ pg.valor | currency }}</dd></div>
+              <div><dt>Recebido em</dt><dd>{{ pg.pagoEm | date: "dd/MM/yyyy, HH:mm" }}</dd></div>
+            </dl>
+          } @else if (p.status === 'CANCELADO') {
+            <p class="card-body subtle">Cancelado antes do pagamento.</p>
+          } @else {
+            <div class="card-body pending-pay">
+              <span class="subtle">Valor a receber</span>
+              <strong>{{ p.total | currency }}</strong>
+            </div>
+          }
+        </div>
+      </aside>
+    </div>
+
+    @if (pagando()) {
+      <app-modal titulo="Registrar pagamento" [subtitulo]="'Pedido #' + p.id + ' · ' + p.cliente.nome" (fechar)="pagando.set(false)">
+        <div class="pay-amount">
+          <span class="subtle">Valor</span>
+          <strong>{{ p.total | currency }}</strong>
+        </div>
+        <fieldset class="methods">
+          <legend class="field-label">Forma de pagamento</legend>
+          @for (m of listaMetodos; track m) {
+            <label class="method" [class.is-selected]="metodoEscolhido() === m">
+              <input type="radio" name="metodo" [value]="m" [checked]="metodoEscolhido() === m" (change)="metodoEscolhido.set(m)" />
+              <i [class]="metodos[m].icon"></i>
+              <span>{{ metodos[m].label }}</span>
+            </label>
+          }
+        </fieldset>
+        <p class="pay-note">
+          <i class="icon-info"></i>
+          Ao confirmar, {{ p.itens.length === 1 ? 'o estoque do produto será baixado' : 'o estoque dos ' + p.itens.length + ' produtos será baixado' }}.
+        </p>
+        <div modal-footer>
+          <button type="button" class="btn btn-secondary" (click)="pagando.set(false)">Voltar</button>
+          <button type="button" class="btn btn-primary" [disabled]="processando()" (click)="confirmarPagamento()">
+            @if (processando()) { <i class="icon-loader-circle spin"></i> }
+            Confirmar pagamento
+          </button>
+        </div>
+      </app-modal>
+    }
+  } @else if (pedido.isLoading() && !erro()) {
+    <div class="card skeleton skeleton--block"></div>
+  }
+</section>
