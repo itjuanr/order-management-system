@@ -7,7 +7,6 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component';
 @Component({
   selector: 'app-cliente',
   templateUrl: './cliente.component.html',
-  styleUrls: ['./cliente.component.css'],
 })
 export class ClienteComponent implements OnInit {
   clientes: Cliente[] = [];

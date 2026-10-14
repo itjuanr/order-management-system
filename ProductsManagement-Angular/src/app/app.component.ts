@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ThemeService } from './theme.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ProductsManagement-Angular';
+
+  // Injetado aqui para o tema salvo ser aplicado também nas telas de login/registro.
+  constructor(private theme: ThemeService) {}
 }

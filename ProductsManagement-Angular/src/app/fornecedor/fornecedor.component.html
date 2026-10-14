@@ -1,51 +1,76 @@
-<div class="container">
-  <h2>Fornecedores</h2>
-  <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Fornecedores</h1>
+      <p>Mantenha dados atualizados de seus fornecedores.</p>
+    </div>
+    <span class="pill">{{ fornecedores.length }} {{ fornecedores.length === 1 ? 'registro' : 'registros' }}</span>
+  </header>
 
-  <div class="search-section">
-    <label for="idPesquisa">Pesquisar por ID:</label>
-    <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
-    <button (click)="pesquisarFornecedoresPorId()">Pesquisar por ID</button>
-  </div>
-
-  <div class="form-section">
-    <h3>{{ isNewFornecedor ? 'Novo Fornecedor' : 'Editar Fornecedor' }}</h3>
-    <form (submit)="createOrUpdateFornecedor()" class="fornecedor-form">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" [(ngModel)]="newFornecedor.nome" required>
-
-      <label for="cnpj">CNPJ:</label>
-      <input type="text" id="cnpj" name="cnpj" [(ngModel)]="newFornecedor.cnpj" mask="00.000.000/0000-00" required>              
-
-      <div class="button-container">
-        <button type="submit" class="action-button">{{ isNewFornecedor ? 'Adicionar Fornecedor' : 'Salvar Edição' }}</button>
-        <button type="button" class="action-button cancel-button" *ngIf="isEditing" (click)="discardChanges()">Cancelar Edição</button>
+  <div class="page-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>{{ isNewFornecedor ? 'Novo fornecedor' : 'Editar fornecedor' }}</h2>
       </div>
-    </form>
-  </div>
+      <form (submit)="createOrUpdateFornecedor()" class="card-body form">
+        <div class="field">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" class="input" [(ngModel)]="newFornecedor.nome" required>
+        </div>
 
-  <div class="list-section">
-    <h3>Lista de Fornecedores</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>CNPJ</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let fornecedor of fornecedores">
-          <td>{{ fornecedor.id }}</td>
-          <td>{{ fornecedor?.nome }}</td>
-          <td>{{ formatCnpj(fornecedor.cnpj) }}</td>
-          <td>
-            <button (click)="editFornecedor(fornecedor)" class="edit-button">Editar</button>
-            <button (click)="deleteFornecedor(fornecedor.id)" class="delete-button">Excluir</button>
-          </td>
-        </tr>        
-      </tbody>
-    </table>
+        <div class="field">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" name="cnpj" class="input" placeholder="00.000.000/0000-00" [(ngModel)]="newFornecedor.cnpj" mask="00.000.000/0000-00" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{{ isNewFornecedor ? 'Adicionar fornecedor' : 'Salvar edição' }}</button>
+          <button type="button" class="btn btn-secondary" *ngIf="isEditing" (click)="discardChanges()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Lista de fornecedores</h2>
+        <div class="search">
+          <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="number" id="idPesquisa" name="idPesquisa" class="input" placeholder="Buscar por ID" aria-label="Buscar fornecedor por ID" [(ngModel)]="idPesquisa" (keyup.enter)="pesquisarFornecedoresPorId()">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="pesquisarFornecedoresPorId()">Buscar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" *ngIf="fornecedores.length">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>CNPJ</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fornecedor of fornecedores">
+              <td class="cell-id">#{{ fornecedor.id }}</td>
+              <td class="cell-strong">{{ fornecedor?.nome }}</td>
+              <td class="num">{{ formatCnpj(fornecedor.cnpj) }}</td>
+              <td class="col-actions">
+                <button type="button" (click)="editFornecedor(fornecedor)" class="icon-btn" title="Editar" aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" (click)="deleteFornecedor(fornecedor.id)" class="icon-btn icon-btn--danger" title="Excluir" aria-label="Excluir"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty" *ngIf="!fornecedores.length">
+          <i class="fa-solid fa-truck-field"></i>
+          <strong>Nenhum fornecedor encontrado</strong>
+          <span>Cadastre o primeiro fornecedor pelo formulário.</span>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>

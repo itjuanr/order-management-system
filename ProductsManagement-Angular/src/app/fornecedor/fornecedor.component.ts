@@ -7,7 +7,6 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component';
 @Component({
   selector: 'app-fornecedor',
   templateUrl: './fornecedor.component.html',
-  styleUrls: ['./fornecedor.component.css'],
 })
 export class FornecedorComponent implements OnInit {
   fornecedores: Fornecedor[] = [];

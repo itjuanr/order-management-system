@@ -1,66 +1,90 @@
-<div class="container">
-  <h2>Produtos</h2>
-  <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Produtos</h1>
+      <p>Adicione, edite e exclua produtos de seu estoque.</p>
+    </div>
+    <span class="pill">{{ produtos.length }} {{ produtos.length === 1 ? 'registro' : 'registros' }}</span>
+  </header>
 
-  <div class="search-section">
-    <h3>Pesquisar por ID</h3>
-    <div class="search-container">
-      <label for="idPesquisa">ID do Produto:</label>
-      <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
-      <button type="button" class="action-button" (click)="pesquisarPorId()">Pesquisar</button>
+  <div class="page-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>{{ modoEdicao ? 'Editar produto' : 'Novo produto' }}</h2>
+      </div>
+      <form (submit)="salvarProduto()" class="card-body form">
+        <div class="field">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" class="input" [(ngModel)]="novoProduto.nome" required>
+        </div>
+
+        <div class="field">
+          <label for="preco">Preço (R$)</label>
+          <input type="number" id="preco" name="preco" class="input" step="0.01" [(ngModel)]="novoProduto.preco" required>
+        </div>
+
+        <div class="field">
+          <label for="categoriaId">ID da categoria</label>
+          <input type="number" id="categoriaId" name="categoriaId" class="input" [(ngModel)]="novoProduto.categoriaId" required>
+        </div>
+
+        <div class="field">
+          <label for="fornecedorId">ID do fornecedor</label>
+          <input type="number" id="fornecedorId" name="fornecedorId" class="input" [(ngModel)]="novoProduto.fornecedorId" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{{ modoEdicao ? 'Salvar edição' : 'Adicionar produto' }}</button>
+          <button type="button" class="btn btn-secondary" *ngIf="modoEdicao" (click)="cancelEdit()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Lista de produtos</h2>
+        <div class="search">
+          <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="number" id="idPesquisa" name="idPesquisa" class="input" placeholder="Buscar por ID" aria-label="Buscar produto por ID" [(ngModel)]="idPesquisa" (keyup.enter)="pesquisarPorId()">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="pesquisarPorId()">Buscar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" *ngIf="produtos.length">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="col-num">Preço</th>
+              <th>Categoria</th>
+              <th>Fornecedor</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let produto of produtos">
+              <td class="cell-id">#{{ produto.id }}</td>
+              <td class="cell-strong">{{ produto?.nome }}</td>
+              <td class="col-num">{{ produto?.preco | currency: 'BRL' }}</td>
+              <td class="cell-id">#{{ produto?.categoriaId }}</td>
+              <td class="cell-id">#{{ produto?.fornecedorId }}</td>
+              <td class="col-actions">
+                <button type="button" (click)="editarProduto(produto)" class="icon-btn" title="Editar" aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" (click)="excluirProduto(produto.id)" class="icon-btn icon-btn--danger" title="Excluir" aria-label="Excluir"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty" *ngIf="!produtos.length">
+          <i class="fa-solid fa-box-open"></i>
+          <strong>Nenhum produto encontrado</strong>
+          <span>Cadastre o primeiro produto pelo formulário.</span>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="form-section">
-    <h3>{{ modoEdicao ? 'Editar Produto' : 'Novo Produto' }}</h3>
-    <form (submit)="salvarProduto()" class="produto-form">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" [(ngModel)]="novoProduto.nome" required>
-
-      <label for="preco">Preço:</label>
-      <input type="number" id="preco" name="preco" [(ngModel)]="novoProduto.preco" required>
-
-      <label for="categoriaId">ID da Categoria:</label>
-      <input type="number" id="categoriaId" name="categoriaId" [(ngModel)]="novoProduto.categoriaId" required>
-
-      <label for="fornecedorId">ID do Fornecedor:</label>
-      <input type="number" id="fornecedorId" name="fornecedorId" [(ngModel)]="novoProduto.fornecedorId" required>
-
-      <div class="button-container">
-        <button type="submit" class="action-button">
-          {{ modoEdicao ? 'Salvar Edição' : 'Adicionar Produto' }}
-        </button>
-        <button type="button" class="action-button cancel-button" *ngIf="modoEdicao" (click)="cancelEdit()">Cancelar Edição</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="list-section">
-    <h3>Lista de Produtos</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Preço</th>
-          <th>Categoria ID</th>
-          <th>Fornecedor ID</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let produto of produtos">
-          <td>{{ produto.id }}</td>
-          <td>{{ produto?.nome }}</td>
-          <td>{{ produto?.preco }}</td>
-          <td>{{ produto?.categoriaId }}</td>
-          <td>{{ produto?.fornecedorId }}</td>
-          <td>
-            <button (click)="editarProduto(produto)" class="edit-button">Editar</button>
-            <button (click)="excluirProduto(produto.id)" class="delete-button">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+</section>

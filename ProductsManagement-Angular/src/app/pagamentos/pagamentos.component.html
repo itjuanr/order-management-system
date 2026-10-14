@@ -1,55 +1,80 @@
-<div class="container">
-  <h2>Pagamentos</h2>
-  <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
-  
-  <div class="search-section">
-    <label for="idPesquisa">Pesquisar por ID:</label>
-    <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
-    <button (click)="pesquisarPorId()">Pesquisar</button>
-  </div>
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Pagamentos</h1>
+      <p>Gerencie transações financeiras e registre pagamentos de pedidos.</p>
+    </div>
+    <span class="pill">{{ pagamentos.length }} {{ pagamentos.length === 1 ? 'registro' : 'registros' }}</span>
+  </header>
 
-  <div class="form-section">
-    <h3>Novo Pagamento</h3>
-    <form (submit)="criarPagamento()" class="pagamento-form">
-      <label for="precoPago">Preço Pago:</label>
-      <input type="number" id="precoPago" name="precoPago" [(ngModel)]="novoPagamento.precoPago" required>
-
-      <label for="pedidoId">ID do Pedido:</label>
-      <input type="number" id="pedidoId" name="pedidoId" [(ngModel)]="novoPagamento.pedidoId" required>
-
-      <div class="button-container">
-        <button type="submit" class="action-button">Adicionar Pagamento</button>
+  <div class="page-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>Novo pagamento</h2>
       </div>
-    </form>
-  </div>
+      <form (submit)="criarPagamento()" class="card-body form">
+        <div class="field">
+          <label for="precoPago">Preço pago (R$)</label>
+          <input type="number" id="precoPago" name="precoPago" class="input" step="0.01" [(ngModel)]="novoPagamento.precoPago" required>
+        </div>
 
-  <div class="list-section">
-    <h3>Lista de Pagamentos</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Valor</th>
-          <th>Data Pagamento</th>
-          <th>Status</th>
-          <th>ID do Pedido</th>
-          <th>ID do Cliente</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let pagamento of pagamentos">
-          <td>{{ pagamento.id }}</td>
-          <td>{{ pagamento.valor }}</td>
-          <td>{{ formatarData(pagamento.dataPagamento) }}</td>
-          <td>{{ pagamento.status }}</td>
-          <td>{{ pagamento.pedidoId }}</td>
-          <td>{{ pagamento.clienteId }}</td>
-          <td>
-            <button (click)="excluirPagamento(pagamento.id)" class="delete-button">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <div class="field">
+          <label for="pedidoId">ID do pedido</label>
+          <input type="number" id="pedidoId" name="pedidoId" class="input" [(ngModel)]="novoPagamento.pedidoId" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Adicionar pagamento</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Lista de pagamentos</h2>
+        <div class="search">
+          <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="number" id="idPesquisa" name="idPesquisa" class="input" placeholder="Buscar por ID" aria-label="Buscar pagamento por ID" [(ngModel)]="idPesquisa" (keyup.enter)="pesquisarPorId()">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="pesquisarPorId()">Buscar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" *ngIf="pagamentos.length">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th class="col-num">Valor</th>
+              <th>Data do pagamento</th>
+              <th>Status</th>
+              <th>Pedido</th>
+              <th>Cliente</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pagamento of pagamentos">
+              <td class="cell-id">#{{ pagamento.id }}</td>
+              <td class="col-num cell-strong">{{ pagamento.valor | currency: 'BRL' }}</td>
+              <td class="num">{{ formatarData(pagamento.dataPagamento) }}</td>
+              <td><span class="badge" [class.badge--success]="(pagamento.status || '').toLowerCase() === 'aprovado'">{{ pagamento.status }}</span></td>
+              <td class="cell-id">#{{ pagamento.pedidoId }}</td>
+              <td class="cell-id">#{{ pagamento.clienteId }}</td>
+              <td class="col-actions">
+                <button type="button" (click)="excluirPagamento(pagamento.id)" class="icon-btn icon-btn--danger" title="Excluir" aria-label="Excluir"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty" *ngIf="!pagamentos.length">
+          <i class="fa-solid fa-credit-card"></i>
+          <strong>Nenhum pagamento encontrado</strong>
+          <span>Registre o primeiro pagamento pelo formulário.</span>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>

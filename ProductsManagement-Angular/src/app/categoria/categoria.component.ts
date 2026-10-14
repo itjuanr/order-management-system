@@ -7,7 +7,6 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component';
 @Component({
   selector: 'app-categoria',
   templateUrl: './categoria.component.html',
-  styleUrls: ['./categoria.component.css'],
 })
 export class CategoriaComponent implements OnInit {
   categorias: Categoria[] = [];

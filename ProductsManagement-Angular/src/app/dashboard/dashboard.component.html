@@ -1,24 +1,31 @@
-<div class="dashboard-container">
-  <h2>Bem-vindo ao Dashboard</h2>
-  <p>Explore as funcionalidades disponíveis:</p>
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Visão geral</h1>
+      <p>Acompanhe os números do sistema e acesse cada módulo.</p>
+    </div>
+  </header>
 
-  <div class="feature-card" *ngFor="let feature of dashboardFeatures">
-    <a [routerLink]="feature.link" class="feature-link">
-      <div class="feature-icon">
-        <i *ngIf="feature.title === 'Clientes'" class="fas fa-users"></i>
-        <i *ngIf="feature.title === 'Fornecedores'" class="fa-solid fa-user-tie"></i>
-        <i *ngIf="feature.title === 'Categorias'" class="fa-solid fa-square-poll-horizontal"></i>
-        <i *ngIf="feature.title === 'Produtos'" class="fa-solid fa-store"></i>
-        <i *ngIf="feature.title === 'Pedidos'" class="fa-solid fa-bell"></i>
-        <i *ngIf="feature.title === 'Pagamento'" class="fa-solid fa-credit-card"></i>
-        <i *ngIf="feature.title === 'Checkout'" class="fa-solid fa-cart-shopping"></i>
-      </div>
-      <div class="feature-info">
-        <h3>{{ feature.title }}</h3>
-        <p>{{ feature.description }}</p>
+  <div class="stats">
+    <a *ngFor="let stat of stats" [routerLink]="stat.link" class="card stat">
+      <span class="stat-icon"><i class="fa-solid" [ngClass]="stat.icon"></i></span>
+      <div>
+        <div class="stat-label">{{ stat.label }}</div>
+        <div class="stat-value">{{ stat.value ?? '–' }}</div>
       </div>
     </a>
   </div>
 
-  <button (click)="logout()">Logout</button>
-</div>
+  <h2 class="section-title">Módulos</h2>
+
+  <div class="modules">
+    <a *ngFor="let feature of dashboardFeatures" [routerLink]="feature.link" class="card module">
+      <span class="module-icon"><i class="fa-solid" [ngClass]="feature.icon"></i></span>
+      <div class="module-info">
+        <h2>{{ feature.title }}</h2>
+        <p>{{ feature.description }}</p>
+      </div>
+      <i class="fa-solid fa-arrow-right module-arrow"></i>
+    </a>
+  </div>
+</section>

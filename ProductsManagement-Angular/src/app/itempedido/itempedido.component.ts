@@ -6,7 +6,6 @@ import { CriarItemPedidoRequestDTO, ItemPedidoDTO } from './itempedido';
 @Component({
   selector: 'app-item-pedido',
   templateUrl: './itempedido.component.html',
-  styleUrls: ['./itempedido.component.css'],
 })
 export class ItemPedidoComponent implements OnInit {
   itemPedidos: ItemPedidoDTO[] = [];
@@ -31,7 +30,7 @@ export class ItemPedidoComponent implements OnInit {
   }
 
   pesquisarPorId(): void {
-    if (this.idPesquisa !== undefined) {
+    if (this.idPesquisa != null) {
       this.itemPedidoService.getItemPedidoById(this.idPesquisa).subscribe(
         (itemPedido) => {
           this.itemPedidos = itemPedido ? [itemPedido] : [];
@@ -40,6 +39,8 @@ export class ItemPedidoComponent implements OnInit {
           console.error('Erro ao obter item de pedido por ID:', error);
         }
       );
+    } else {
+      this.carregarTodosOsItemPedidos();
     }
   }
 

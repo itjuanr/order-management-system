@@ -4,11 +4,14 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-confirm-dialog',
   template: `
-    <h1 mat-dialog-title>{{ data.title }}</h1>
-    <div mat-dialog-content>{{ data.message }}</div>
-    <div mat-dialog-actions>
-      <button mat-button [mat-dialog-close]="true">Sim</button>
-      <button mat-button [mat-dialog-close]="false">Não</button>
+    <div class="confirm">
+      <div class="confirm-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <h2>{{ data.title }}</h2>
+      <p>{{ data.message }}</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" [mat-dialog-close]="false">Não</button>
+        <button type="button" class="btn btn-primary" [mat-dialog-close]="true">Sim</button>
+      </div>
     </div>
   `,
 })

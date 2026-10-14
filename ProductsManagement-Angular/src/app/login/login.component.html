@@ -1,28 +1,56 @@
-<!-- Seu template HTML (login.component.html) -->
+<div class="auth">
+  <aside class="auth-aside">
+    <div class="brand">
+      <span class="brand-mark"><i class="fa-solid fa-boxes-stacked"></i></span>
+      <span class="brand-name">Pedidos <small>Gerenciamento</small></span>
+    </div>
 
-<form [formGroup]="loginForm" (ngSubmit)="login()" class="login-container">
+    <div class="auth-pitch">
+      <h1>Pedidos, estoque e pagamentos em um só lugar.</h1>
+      <p>Cadastre fornecedores e produtos, registre vendas e acompanhe cada pagamento até o checkout.</p>
+    </div>
 
-  <label>Login:</label>
-  <input formControlName="login" required>
-  <div *ngIf="loginForm.get('login')?.hasError('required') && loginForm.get('login')?.touched" class="error-message">
-    Campo obrigatório.
-  </div>
+    <ul class="auth-points">
+      <li><i class="fa-solid fa-box-open"></i> Catálogo de produtos por categoria e fornecedor</li>
+      <li><i class="fa-solid fa-receipt"></i> Pedidos vinculados a clientes</li>
+      <li><i class="fa-solid fa-credit-card"></i> Controle de pagamentos e checkout</li>
+    </ul>
+  </aside>
 
-  <label>Password:</label>
-  <input formControlName="password" type="password" required>
-  <div *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched" class="error-message">
-    Campo obrigatório.
-  </div>
+  <main class="auth-main">
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-card form">
+      <div>
+        <h1>Entrar</h1>
+        <p class="muted">Acesse sua conta para continuar.</p>
+      </div>
 
-  <button type="submit">Login</button>
+      <div *ngIf="loginError" class="alert alert--danger">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ loginError }}
+      </div>
 
-  <button (click)="redirectToRegistration()" class="register-button">Registrar</button>
+      <div *ngIf="loginSuccess" class="alert alert--success">
+        <i class="fa-solid fa-circle-check"></i> {{ loginSuccess }}
+      </div>
 
-  <div *ngIf="loginError" class="error-message">
-    {{ loginError }}
-  </div>
+      <div class="field">
+        <label for="login">Login</label>
+        <input id="login" class="input" formControlName="login" autocomplete="username" required>
+        <span *ngIf="loginForm.get('login')?.hasError('required') && loginForm.get('login')?.touched" class="field-error">
+          Campo obrigatório.
+        </span>
+      </div>
 
-  <div *ngIf="loginSuccess" class="success-message">
-    {{ loginSuccess }}
-  </div>
-</form>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input id="password" class="input" formControlName="password" type="password" autocomplete="current-password" required>
+        <span *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched" class="field-error">
+          Campo obrigatório.
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+
+      <p class="auth-switch">Ainda não tem conta? <a routerLink="/auth/registro">Criar conta</a></p>
+    </form>
+  </main>
+</div>

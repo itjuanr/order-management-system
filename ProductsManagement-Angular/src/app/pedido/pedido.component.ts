@@ -7,7 +7,6 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component';
 @Component({
   selector: 'app-pedido',
   templateUrl: './pedido.component.html',
-  styleUrls: ['./pedido.component.css'],
 })
 export class PedidoComponent implements OnInit {
   pedidos: PedidoDTO[] = [];

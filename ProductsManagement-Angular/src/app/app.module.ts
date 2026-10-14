@@ -1,11 +1,13 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import { RegistroComponent } from './registro/registro.component'; 
+import { RegistroComponent } from './registro/registro.component';
 import { MessageService } from './message.service';
 import { ClienteComponent } from './cliente/cliente.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -22,6 +24,9 @@ import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { PagamentoComponent } from './pagamentos/pagamentos.component';
 import { ItemPedidoComponent } from './itempedido/itempedido.component';
+import { LayoutComponent } from './layout/layout.component';
+
+registerLocaleData(localePt);
 
 @NgModule({
   declarations: [
@@ -36,12 +41,13 @@ import { ItemPedidoComponent } from './itempedido/itempedido.component';
     PedidoComponent,
     ConfirmDialogComponent,
     PagamentoComponent,
-    ItemPedidoComponent,  
+    ItemPedidoComponent,
+    LayoutComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
     RouterModule,
@@ -50,7 +56,7 @@ import { ItemPedidoComponent } from './itempedido/itempedido.component';
     MatButtonModule,
     NgxMaskModule.forRoot()
   ],
-  providers: [MessageService, AuthGuard],
+  providers: [MessageService, AuthGuard, { provide: LOCALE_ID, useValue: 'pt-BR' }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

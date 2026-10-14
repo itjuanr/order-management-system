@@ -8,7 +8,6 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-pagamento',
   templateUrl: './pagamentos.component.html',
-  styleUrls: ['./pagamentos.component.css'],
   providers: [DatePipe],
 })
 export class PagamentoComponent implements OnInit {

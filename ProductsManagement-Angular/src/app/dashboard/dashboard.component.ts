@@ -1,54 +1,52 @@
 // dashboard.component.ts
-import { Component } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { NAV_ITEMS } from '../nav-items';
+import { ClienteService } from '../cliente/cliente.service';
+import { ProdutoService } from '../produto/produto.service';
+import { PedidoService } from '../pedido/pedido.service';
+import { PagamentoService } from '../pagamentos/pagamento.service';
+
+interface DashboardStat {
+    label: string;
+    icon: string;
+    link: string;
+    value: number | null;
+}
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.css'], 
 })
-export class DashboardComponent {
-    dashboardFeatures = [
-        {
-            title: 'Clientes',
-            description: 'Gerencie informações de seus clientes.',
-            link: '/cliente',
-        },
-        {
-            title: 'Categorias',
-            description: 'Explore e administre categorias de produtos.',
-            link: '/categoria',
-        },
-        {
-            title: 'Fornecedores',
-            description: 'Mantenha dados atualizados de seus fornecedores.',
-            link: '/fornecedor',
-        },
-        {
-            title: 'Produtos',
-            description: 'Adicione, edite e exclua produtos de seu estoque.',
-            link: '/produto',
-        },
-        {
-            title: 'Pedidos',
-            description: 'Acompanhe e gerencie pedidos realizados.',
-            link: '/pedido',
-        },
-        {
-            title: 'Pagamento',
-            description: 'Gerencie transações financeiras e registre pagamentos de pedidos.',
-            link: '/pagamentos',
-        },
-        {
-            title: 'Checkout',
-            description: 'Registre pagamentos e confirme pedidos para concluir suas transações.',
-            link: '/checkout',
-        },
-    ];
+export class DashboardComponent implements OnInit {
+    dashboardFeatures = NAV_ITEMS;
+    stats: DashboardStat[] = [];
 
-    constructor(private authService: AuthService) {}
+    constructor(
+        private clienteService: ClienteService,
+        private produtoService: ProdutoService,
+        private pedidoService: PedidoService,
+        private pagamentoService: PagamentoService
+    ) {}
 
-    logout(): void {
-        this.authService.logout();
+    ngOnInit(): void {
+        this.addStat('Clientes', 'fa-users', '/cliente', this.clienteService.getAllClientes());
+        this.addStat('Produtos', 'fa-box-open', '/produto', this.produtoService.getAllProdutos());
+        this.addStat('Pedidos', 'fa-receipt', '/pedido', this.pedidoService.getAllPedidos());
+        this.addStat('Pagamentos', 'fa-credit-card', '/pagamentos', this.pagamentoService.getAllPagamentos());
+    }
+
+    private addStat(label: string, icon: string, link: string, source: Observable<unknown[]>): void {
+        const stat: DashboardStat = { label, icon, link, value: null };
+        this.stats.push(stat);
+
+        source.subscribe(
+            (items) => {
+                stat.value = items.length;
+            },
+            (error) => {
+                console.error(`Erro ao obter total de ${label}:`, error);
+            }
+        );
     }
 }

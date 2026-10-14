@@ -1,54 +1,78 @@
-<div class="container">
-    <h2>Checkout</h2>
-    <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
-    <div class="search-section">
-      <h3>Pesquisar por ID</h3>
-      <div class="search-container">
-        <label for="idPesquisa">ID do Item de Pedido:</label>
-        <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
-        <button type="button" class="action-button" (click)="pesquisarPorId()">Pesquisar</button>
-      </div>
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Checkout</h1>
+      <p>Registre pagamentos e confirme pedidos para concluir suas transações.</p>
     </div>
-  
-    <div class="form-section">
-      <h3>Novo Checkout</h3>
-      <form (submit)="criarNovoItemPedido()" class="item-pedido-form">
-        <label for="pedidoId">ID do Pedido:</label>
-        <input type="number" id="pedidoId" name="pedidoId" [(ngModel)]="novoItemPedidoRequest.pedidoId" required>
-  
-        <label for="pagamentoId">ID do Pagamento:</label>
-        <input type="number" id="pagamentoId" name="pagamentoId" [(ngModel)]="novoItemPedidoRequest.pagamentoId" required>
-  
-        <button type="submit" class="action-button">Adicionar</button>
+    <span class="pill">{{ itemPedidos.length }} {{ itemPedidos.length === 1 ? 'registro' : 'registros' }}</span>
+  </header>
+
+  <div class="page-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>Novo checkout</h2>
+      </div>
+      <form (submit)="criarNovoItemPedido()" class="card-body form">
+        <div class="field">
+          <label for="pedidoId">ID do pedido</label>
+          <input type="number" id="pedidoId" name="pedidoId" class="input" [(ngModel)]="novoItemPedidoRequest.pedidoId" required>
+        </div>
+
+        <div class="field">
+          <label for="pagamentoId">ID do pagamento</label>
+          <input type="number" id="pagamentoId" name="pagamentoId" class="input" [(ngModel)]="novoItemPedidoRequest.pagamentoId" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
       </form>
     </div>
-  
-    <div class="list-section">
-        <h3>Lista de Checkout</h3>
-        <table>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Lista de checkout</h2>
+        <div class="search">
+          <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="number" id="idPesquisa" name="idPesquisa" class="input" placeholder="Buscar por ID" aria-label="Buscar item de pedido por ID" [(ngModel)]="idPesquisa" (keyup.enter)="pesquisarPorId()">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="pesquisarPorId()">Buscar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" *ngIf="itemPedidos.length">
           <thead>
             <tr>
               <th>ID</th>
-              <th>ID do Pedido</th>
-              <th>ID do Pagamento</th>
-              <th>ID do Produto</th>
-              <th>Quantidade</th>
-              <th>Preço</th>
-              <th>Status do Pagamento</th>
+              <th>Pedido</th>
+              <th>Pagamento</th>
+              <th>Produto</th>
+              <th class="col-num">Qtd.</th>
+              <th class="col-num">Preço</th>
+              <th>Status do pagamento</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let itemPedido of itemPedidos">
-              <td>{{ itemPedido.id }}</td>
-              <td>{{ itemPedido.pedidoId }}</td>
-              <td>{{ itemPedido.pagamentoId }}</td>
-              <td>{{ itemPedido.produtoId }}</td>
-              <td>{{ itemPedido.quantidade }}</td>
-              <td>{{ itemPedido.preco }}</td>
-              <td>{{ itemPedido.statusPagamento }}</td>
+              <td class="cell-id">#{{ itemPedido.id }}</td>
+              <td class="cell-id">#{{ itemPedido.pedidoId }}</td>
+              <td class="cell-id">#{{ itemPedido.pagamentoId }}</td>
+              <td class="cell-id">#{{ itemPedido.produtoId }}</td>
+              <td class="col-num">{{ itemPedido.quantidade }}</td>
+              <td class="col-num cell-strong">{{ itemPedido.preco | currency: 'BRL' }}</td>
+              <td><span class="badge" [class.badge--success]="(itemPedido.statusPagamento || '').toLowerCase() === 'aprovado'">{{ itemPedido.statusPagamento }}</span></td>
             </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+
+        <div class="empty" *ngIf="!itemPedidos.length">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <strong>Nenhum checkout encontrado</strong>
+          <span>Conclua o primeiro checkout pelo formulário.</span>
+        </div>
+      </div>
     </div>
   </div>
-  
+</section>

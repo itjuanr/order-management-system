@@ -6,7 +6,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.component.html',
-  styleUrls: ['./registro.component.css']
 })
 export class RegistroComponent {
   registroForm: FormGroup;
@@ -30,9 +29,5 @@ export class RegistroComponent {
         console.error(error);
       }
     );
-  }
-
-  voltarParaLogin(): void {
-    this.router.navigate(['/auth/login']);
   }
 }

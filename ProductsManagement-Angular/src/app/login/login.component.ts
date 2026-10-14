@@ -9,7 +9,6 @@ import { MessageService } from '../message.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -58,10 +57,5 @@ export class LoginComponent implements OnInit {
         this.messageService.showMessage({ text: this.loginError, type: 'error' });
       }
     );
-  }
-  
-
-  redirectToRegistration() {
-    this.router.navigate(['/auth/registro']);
   }
 }
